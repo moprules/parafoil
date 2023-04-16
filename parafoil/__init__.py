@@ -3,7 +3,7 @@ from . import matrix
 from . import planet
 from . import mass
 from . import mesh
-from . import velocity
+from . import aerodynamic
 import yaml
 import numpy as np
 
@@ -54,7 +54,8 @@ class PFSim:
         matrix.apparent_mass_matrices(self.model)
         mass.addmass(self.model, self.state)
         mass.inertia_initialization(self.model, self.state)
-        velocity.velocity_initialization(self.model, self.state)
+        aerodynamic.velocity_initialization(self.model, self.state)
+        aerodynamic.HVM(self.model, self.state)
 
     def start(self):
         # Собираем модель при первом запуске

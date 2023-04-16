@@ -53,3 +53,4 @@ def inertia_initialization(model, state):
                           [-I["xz"], -I["yz"], I["zz"]]]
     state["moments_of_inertia"] = np.asarray(moments_of_inertia)
     simulate_inertia(model, state)
+
