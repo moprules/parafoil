@@ -57,6 +57,7 @@ class PFSim:
         aerodynamic.velocity_initialization(self.model, self.state)
         aerodynamic.HVM(self.model, self.state)
         mass.payload_loads_contribution(self.model, self.state)
+        mass.simulate_aparent_mass(self.model, self.state)
 
     def start(self):
         # Собираем модель при первом запуске

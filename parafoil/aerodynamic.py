@@ -17,9 +17,9 @@ def velocity_initialization(model: dict, state: dict):
     state["sideslip_angle"] = np.arcsin(state["Vref_b"][1]/state["Vrefn"])
 
     cr = model["canopy"]["root_chord"]
-    state["Xcg_aero"] = model["canopy"]["Xref_b"] + \
-        state["b2c"].transpose().dot(state["m2c"].dot(
-            np.asarray([[cr/4], [0.0], [0.0]])))
+    state["Xcg_aero"] = (model["canopy"]["Xref_b"] +
+                         state["b2c"].transpose().dot(state["m2c"].dot(
+                             np.asarray([[cr/4], [0.0], [0.0]]))))
 
     w2b = np.zeros((3, 3))
 
