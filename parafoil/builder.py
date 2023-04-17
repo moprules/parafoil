@@ -15,6 +15,7 @@ def build(params: dict) -> dict:
     prepare_canopy(model)
     prepare_wind(model)
     prepare_autopilot(model)
+    prepare_target(model)
     return model
 
 
@@ -116,3 +117,14 @@ def prepare_autopilot(model: dict):
     ap["left_brake_command"] = 0
     ap["right_brake_command"] = 0
     ap["glide_slope_command"] = 0
+
+    ap["tol_angle"] = np.radians(ap["tol_angle"])
+
+
+def prepare_target(model: dict):
+    target = model["target"]
+    body = model["body"]
+
+    pos_north = (target["north"] - body["north"])
+    pos_east = (target["east"] - body["east"])
+    target["init_dist"] = (pos_north**2+pos_east**2)**0.5

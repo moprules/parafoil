@@ -79,3 +79,14 @@ def matrices_definition(state: dict):
            [0.0,                   1.0, 0.0],
            [np.sin(rigging_angle), 0.0, np.cos(rigging_angle)]]
     state["b2c"] = np.asarray(b2c)
+
+
+def inertia_track(position_target_north, position_target_east) -> np.ndarray:
+    # Transformation matrix from inertia axes to track axes
+    track_length = np.sqrt(position_target_north**2 + position_target_east**2)
+    track_angle = np.arccos(position_target_north/track_length)
+    i2t = [[-np.sin(track_angle - np.pi/2), np.cos(track_angle - np.pi/2), 0.0],
+           [np.cos(track_angle - np.pi/2), np.sin(track_angle - np.pi/2), 0.0],
+           [0.0,                           0.0,                          0.0]]
+    i2t = np.asarray(i2t)
+    return i2t

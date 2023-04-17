@@ -14,6 +14,7 @@ def velocity_initialization(model: dict, state: dict):
     state["Vref_m"] = state["m2c"].transpose().dot(
         state["b2c"].dot(state["Vref_b"]))
     state["alpha"] = np.arctan(state["Vref_b"][2]/state["Vref_b"][0])
+    state["prev"]["alpha"] = state["alpha"]
     state["sideslip_angle"] = np.arcsin(state["Vref_b"][1]/state["Vrefn"])
 
     cr = model["canopy"]["root_chord"]
@@ -91,9 +92,20 @@ def vortxl(X1, X2, XP, gamma):
     r1xr2 = np.cross(r1, r2)
     norm_r1xr2 = np.linalg.norm(r1xr2)
 
-    inv_r1xr2 = 1.0 / norm_r1xr2
-    inv_r1 = 1.0 / norm_r1
-    inv_r2 = 1.0 / norm_r2
+    if norm_r1xr2 == 0:
+        inv_r1xr2 = 0
+    else:
+        inv_r1xr2 = 1.0 / norm_r1xr2
+    
+    if norm_r1 == 0:
+        inv_r1 = 0
+    else:
+        inv_r1 = 1.0 / norm_r1
+
+    if norm_r2 == 0:
+        inv_r2 = 0
+    else:
+        inv_r2 = 1.0 / norm_r2
 
     a = r0 * inv_r1xr2
     b = r1*inv_r1 - r2*inv_r2
@@ -178,8 +190,10 @@ def HVM(model: dict, state: dict):
         uinf = -mesh["Vinf"][j, :]
         B[j, 0] = -np.dot(uinf, nunit)
     # Circulation
-    Circ = np.linalg.solve(A, B)
-    Circ = np.squeeze(Circ)
+    try:
+        Circ = np.linalg.solve(A, B)
+    except:
+        Circ = np.zeros((mesh["N"], 1))
 
     # Loads computation (Kutta-Joukowsky)
     local_force = np.zeros((3, mesh["N"]))

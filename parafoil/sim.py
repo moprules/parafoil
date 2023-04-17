@@ -2,6 +2,15 @@ from . import matrix
 import numpy as np
 
 
+def get_precision(f):
+    str_f = str(f)
+    if '.' not in str_f:
+        return 0
+
+    # Получение строки после точки и возвращение ее длины
+    return len(str_f[str_f.index('.') + 1:])
+
+
 def state_derivatives(Xe, state):
     U, V, W = Xe[:3]
     PHI, THETA, PSI = Xe[3:6]
@@ -90,13 +99,13 @@ def simulate_state(model: dict, state: dict):
     T, Xe = EULER(T, DT, Xe, state)
 
     # Trajectory integration
-    dtrav_dist = ((Xe[9]-state["pos_north"])**2 +
-                  (Xe[10]-state["pos_east"])**2 +
-                  (Xe[11]-state["altitude"])**2)**0.5
-    state["traveled_distance"] = state["traveled_distance"] + dtrav_dist
+    state["dtrav_dist"] = ((Xe[9]-state["pos_north"])**2 +
+                           (Xe[10]-state["pos_east"])**2 +
+                           (Xe[11]-state["altitude"])**2)**0.5
+    state["traveled_distance"] = state["traveled_distance"] + state["dtrav_dist"]
 
-    dlost_altitude = (Xe[11] - state["altitude"])
-    state["lost_altitude"] = state["lost_altitude"] + dlost_altitude
+    state["dlost_altitude"] = (Xe[11] - state["altitude"])
+    state["lost_altitude"] = state["lost_altitude"] + state["dlost_altitude"]
 
     [state["Vcg_b"][0, 0],
      state["Vcg_b"][1, 0],
@@ -110,7 +119,8 @@ def simulate_state(model: dict, state: dict):
      state["pos_east"],
      state["pos_north"],
      state["altitude"]] = Xe
-    state["time"] = T
+
+    state["time"] = round(T, get_precision(DT))
 
     matrix.matrices_definition(state)
 
