@@ -4,6 +4,7 @@ from . import planet
 from . import mass
 from . import mesh
 from . import aerodynamic
+from . import sim
 import yaml
 import numpy as np
 
@@ -35,9 +36,9 @@ class PFSim:
         self.state["pitch"] = self.model["body"]["pitch"]
         self.state["yaw"] = self.model["body"]["yaw"]
         self.state["rigging_angle"] = self.model["canopy"]["rigging_angle"]
+        self.state["pos_east"] = self.model["body"]["east"]
+        self.state["pos_north"] = self.model["body"]["north"]
         self.state["altitude"] = self.model["body"]["altitude"]
-        self.state["east"] = self.model["body"]["east"]
-        self.state["north"] = self.model["body"]["north"]
         # Снижение высоты корабля
         self.state["lost_altitude"] = 0
         # Пройденное расстояние
@@ -59,14 +60,25 @@ class PFSim:
         mass.payload_loads_contribution(self.model, self.state)
         mass.simulate_aparent_mass(self.model, self.state)
 
+        # Adding the forces and moments contributions in Body frame
+        self.state["total_force"] = (self.state["aerodynamic_force"] +
+                                     np.squeeze(self.state["force_payload_bodyframe"]) +
+                                     np.squeeze(self.state["weight"]) +
+                                     np.squeeze(self.state["apparent_mass_force"]))
+        self.state["total_moment"] = (self.state["aerodynamic_moment"] +
+                                      np.squeeze(self.state["moment_payload_bodyframe"]) +
+                                      self.state["apparent_mass_moment"])
+
     def start(self):
         # Собираем модель при первом запуске
         self.build()
         # Задаём начальные состояния
         self.init_state()
+        # Цикл расчёта
+        self.loop()
 
     def step(self):
-        pass
+        sim.simulate_state(self.model, self.state)
 
     def loop(self):
         while self.state["time"] < self.model["time"]["final"] and self.state["altitude"] > 0:

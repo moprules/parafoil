@@ -115,10 +115,11 @@ def simulate_aparent_mass(model: dict, state: dict):
             model["I_H"].dot(angular_velocity_canopy))
     apparent_mass_force = (-state["b2c"].transpose().dot(SWC.dot(VAUX)) -
                            (np.dot(IAM_bis, SWB).dot(state["i2b"])).dot(state["Vwind"]))
+    state["apparent_mass_force"] = apparent_mass_force
 
     # Aparent mass moment contributions
     # -(-SCGM*(b2c'*(SWC*VAUX)) - b2c'*(SWC*(I_H*velocity_canopy)) + b2c'*(((SWC*I_AI) + (SVAC*I_H))*angular_velocity_canopy)- ((((SCGM*IAM_bis)+IH_bis)*SWC)*i2b)*Vwind).*[0;1;0]
-    apparent_mass_moment = 0
+    state["apparent_mass_moment"] = 0
 
     # ASSEMBLING APPARENT MASS TERMS INTO GLOBAL INERTIA MATRIX
     MAUX1 = IH_bis - IAM_bis.dot(SCGM)
