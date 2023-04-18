@@ -181,57 +181,91 @@ void biot_savart(int N, double b, double *A, double *B, double *normals, double 
     }
 }
 
-void kutta_joukowsky(double N, double Rho, double *local_force, double *xbound, double *coord, double *Circ)
+void kutta_joukowsky(int N, double b, double Rho, double *local_force, double *xbound, double *coord, double *Circ, double *Vinf2)
 {
     double xa[3] = {0, 0, 0};
     double xb[3] = {0, 0, 0};
     double xc[3] = {0, 0, 0};
     double xd[3] = {0, 0, 0};
-    for (size_t j = 0; j < count; j++)
+    double xp[3] = {0, 0, 0};
+    double coord_diff = 0;
+    double Wk[3] = {0, 0, 0};
+    double uinf[3] = {0, 0, 0};
+    double wkind1[3] = {0, 0, 0};
+    double wkind3[3] = {0, 0, 0};
+    double v_i[3] = {0, 0, 0};
+    double d_g[3] = {0, 0, 0};
+    double f[3] = {0, 0, 0};
+
+    for (size_t j = 0; j < N; j++)
     {
-        /* code */
+        for (size_t r = 0; r < 3; r++)
+        {
+            // xp[r] = xbound[r, j];
+            xp[r] = *(xbound + r * N + j);
+            Wk[r] = 0;
+            uinf[r] = -*(Vinf2 + j * 3 + r);
+        }
+        for (size_t k = 0; k < N; k++)
+        {
+            // xb[0] = xbound[0, k];
+            xb[0] = *(xbound + 0 * N + k);
+            xa[0] = xb[0] + 20 * b;
+            xc[0] = xb[0];
+            xd[0] = xa[0];
+
+            // xb[1] = coord[1, k];
+            xb[1] = *(coord + 1 * (N + 1) + k);
+            xa[1] = xb[1];
+            // xc[1] = coord[1, k + 1];
+            xc[1] = *(coord + 1 * (N + 1) + k + 1);
+            xd[1] = xc[1];
+
+            // (coord[2, k + 1] - coord[2, k]) / 2
+            coord_diff = (*(coord + 2 * (N + 1) + k + 1) - *(coord + 2 * (N + 1) + k)) / 2;
+            // xbound[2,k] - coord_diff
+            xb[2] = *(xbound + 2 * N + k) - coord_diff;
+            xa[2] = xb[2];
+            // xbound[2,k] + coord_diff
+            xc[2] = *(xbound + 2 * N + k) + coord_diff;
+            xd[2] = xc[2];
+
+            // First trailing vortex
+            vortxl(wkind1, xa, xb, xp, *(Circ + k * 1 + 0));
+            // Second trailing vortex
+            vortxl(wkind3, xc, xd, xp, *(Circ + k * 1 + 0));
+
+            // Down Wash
+            v_sum(Wk, Wk, wkind1);
+            v_sum(Wk, Wk, wkind3);
+        }
+
+        // Induced + Kinematic velocity
+        v_sum(v_i, Wk, uinf);
+
+        // Bound vortex
+        for (size_t r = 0; r < 3; r++)
+        {
+            // xb = coord[:, j]
+            xb[r] = *(coord + r * (N + 1) + j);
+            // xc = coord[:, j+1]
+            xc[r] = *(coord + r * (N + 1) + j + 1);
+        }
+        // if (1)
+        // {
+        //     printf("xb = ");
+        //     print_matrix(xb, 1, 3);
+        // }
+        // Gamma is per unit lenght
+        v_diff(d_g, xc, xb);
+        v_mult(d_g, d_g, *(Circ + j * 1 + 0));
+        // KJ
+        v_cross(f, v_i, d_g);
+        v_mult(f, f, Rho);
+        for (size_t r = 0; r < 3; r++)
+        {
+            // local_force[:, j]
+            *(local_force + r * N + j) = f[r];
+        }
     }
-    
-    // for j in range(mesh["N"]):
-    //     xp = mesh["xbound"][:, j]
-    //     Wk = np.zeros(3)
-    //     for k in range(mesh["N"]):
-    //         xb[0] = mesh["xbound"][0, k]
-    //         xa[0] = xb[0] + 20*b
-    //         xc[0] = xb[0]
-    //         xd[0] = xa[0]
-
-    //         xb[1] = mesh["coord"][1, k]
-    //         xa[1] = xb[1]
-    //         xc[1] = mesh["coord"][1, k+1]
-    //         xd[1] = xc[1]
-
-    //         xb[2] = (mesh["xbound"][2, k] -
-    //                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    //         xa[2] = xb[2]
-    //         xc[2] = (mesh["xbound"][2, k] +
-    //                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    //         xd[2] = xc[2]
-    //         xa = xa[:]
-    //         xb = xb[:]
-    //         xc = xc[:]
-    //         xd = xd[:]
-
-    //         # First trailing vortex
-    //         wkind1 = vortxl(xa, xb, xp, Circ[k])
-    //         # Second trailing vortex
-    //         wkind3 = vortxl(xc, xd, xp, Circ[k])
-
-    //         # Down Wash
-    //         Wk = Wk + wkind1 + wkind3
-    //     uinf = -mesh["Vinf2"][j, :]
-    //     # Induced + Kinematic velocity
-    //     v_i = Wk + uinf
-    //     # Bound vortex
-    //     xb = mesh["coord"][:, j]
-    //     xc = mesh["coord"][:, j+1]
-    //     # Gamma is per unit lenght
-    //     d_g = (xc-xb)*Circ[j]
-    //     # KJ
-    //     local_force[:, j] = np.cross(v_i, d_g)*state["Rho"]
 }

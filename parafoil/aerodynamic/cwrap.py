@@ -31,10 +31,12 @@ aero.biot_savart.argtypes = [ctypes.c_int,      # N
 # Функция ничего не возвращает
 aero.kutta_joukowsky.restype = None
 aero.kutta_joukowsky.argtypes = [ctypes.c_int,      # N
+                                 ctypes.c_double,   # b
                                  ctypes.c_double,   # Rho
                                  с_arr2d,           # local_force
                                  с_arr2d,           # xbound
                                  с_arr2d,           # coord
-                                 с_arr2d]           # Circ
+                                 с_arr2d,           # Circ
+                                 с_arr2d]           # Vinf2
 
 __all__ = ["aero"]
