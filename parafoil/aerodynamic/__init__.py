@@ -1,31 +1,6 @@
-from . import matrix
-import ctypes
-import sys
-import os
+from .. import matrix
+from .cwrap import aero
 import numpy as np
-from numpy.ctypeslib import ndpointer
-
-IS_WIN = "win" in sys.platform.lower()
-if IS_WIN:
-    lollib_name = "lol.dll"
-else:
-    lollib_name = "lol.so"
-
-lolpath = os.path.join(os.path.dirname(__file__), lollib_name)
-
-
-lol = ctypes.CDLL(lolpath)
-lol.biot_savart.restype = None
-np_arr = ndpointer(dtype=ctypes.c_double, ndim=2, flags='C_CONTIGUOUS')
-lol.biot_savart.argtypes = [ctypes.c_int,    # N
-                            ctypes.c_double,  # b
-                            np_arr,  # A
-                            np_arr,  # B
-                            np_arr,  # normals
-                            np_arr,  # xctrl
-                            np_arr,  # xbound
-                            np_arr,  # coord
-                            np_arr]  # Vinf
 
 
 def velocity_initialization(model: dict, state: dict):
@@ -92,7 +67,7 @@ def velocity_initialization(model: dict, state: dict):
         # Aerodynamic velocity seen by the current control point (matlab axes)
         mesh["Vinf"][k, :] = np.squeeze(Vref_m - Vrot_m)
         mesh["Vinf2"][k, :] = np.squeeze(Vref_m - Vrot_m2)
-    
+
     mesh["Vinf"] = np.ascontiguousarray(mesh["Vinf"])
     mesh["Vinf2"] = np.ascontiguousarray(mesh["Vinf2"])
 
@@ -180,15 +155,15 @@ def HVM(model: dict, state: dict):
     B = np.zeros((mesh["N"], 1))
     B = np.ascontiguousarray(B)
     b = model["canopy"]["span"]
-    lol.biot_savart(mesh["N"],
-                    b,
-                    A,
-                    B,
-                    normals,
-                    mesh["xctrl"],
-                    mesh["xbound"],
-                    mesh["coord"],
-                    mesh["Vinf"])
+    aero.biot_savart(mesh["N"],
+                     b,
+                     A,
+                     B,
+                     normals,
+                     mesh["xctrl"],
+                     mesh["xbound"],
+                     mesh["coord"],
+                     mesh["Vinf"])
     # one = 1.0
     # xa = np.zeros(3)
     # xb = np.zeros(3)
@@ -285,7 +260,7 @@ def HVM(model: dict, state: dict):
         # KJ
         local_force[:, j] = np.cross(v_i, d_g)*state["Rho"]
 
-    #    Aerodynamic forces and moments according to HVM
+    # Aerodynamic forces and moments according to HVM
     tot_force = np.zeros(6)
     for i in range(mesh["N"]):
         r = mesh["xbound"][:, i]

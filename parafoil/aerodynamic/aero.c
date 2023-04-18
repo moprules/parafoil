@@ -180,3 +180,8 @@ void biot_savart(int N, double b, double *A, double *B, double *normals, double 
         }
     }
 }
+
+void kutta_joukowsky()
+{
+    // 1
+}

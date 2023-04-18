@@ -1,3 +1,2 @@
-lol:
-	# g++ -shared -fPIC -o parafoil/lol.so parafoil/lol.cpp
-	gcc -shared -o parafoil/lol.so -fPIC parafoil/lol.c
+aero:
+	gcc -shared -o parafoil/aerodynamic/aero.so -fPIC parafoil/aerodynamic/aero.c
