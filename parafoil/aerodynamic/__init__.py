@@ -149,11 +149,11 @@ def HVM(model: dict, state: dict):
         normals[2, i] = dz*aux
 
     # Equations and Biot - Savart law
-    normals = np.ascontiguousarray(normals)
+    # normals = np.ascontiguousarray(normals)
     A = np.zeros((mesh["N"], mesh["N"]))
-    A = np.ascontiguousarray(A)
+    # A = np.ascontiguousarray(A)
     B = np.zeros((mesh["N"], 1))
-    B = np.ascontiguousarray(B)
+    # B = np.ascontiguousarray(B)
     b = model["canopy"]["span"]
     aero.biot_savart(mesh["N"],
                      b,
@@ -211,8 +211,14 @@ def HVM(model: dict, state: dict):
     except:
         Circ = np.zeros((mesh["N"], 1))
 
-    # Loads computation (Kutta-Joukowsky)
     local_force = np.zeros((3, mesh["N"]))
+    # Loads computation (Kutta-Joukowsky)
+    aero.kutta_joukowsky(mesh["N"],
+                         state["Rho"],
+                         local_force,
+                         mesh["xbound"],
+                         mesh["coord"],
+                         Circ)
     xa = np.zeros(3)
     xb = np.zeros(3)
     xc = np.zeros(3)
