@@ -1,5 +1,31 @@
-import numpy as np
 from . import matrix
+import ctypes
+import sys
+import os
+import numpy as np
+from numpy.ctypeslib import ndpointer
+
+IS_WIN = "win" in sys.platform.lower()
+if IS_WIN:
+    lollib_name = "lol.dll"
+else:
+    lollib_name = "lol.so"
+
+lolpath = os.path.join(os.path.dirname(__file__), lollib_name)
+
+
+lol = ctypes.CDLL(lolpath)
+lol.biot_savart.restype = None
+np_arr = ndpointer(dtype=ctypes.c_double, ndim=2, flags='C_CONTIGUOUS')
+lol.biot_savart.argtypes = [ctypes.c_int,    # N
+                            ctypes.c_double,  # b
+                            np_arr,  # A
+                            np_arr,  # B
+                            np_arr,  # normals
+                            np_arr,  # xctrl
+                            np_arr,  # xbound
+                            np_arr,  # coord
+                            np_arr]  # Vinf
 
 
 def velocity_initialization(model: dict, state: dict):
@@ -66,6 +92,9 @@ def velocity_initialization(model: dict, state: dict):
         # Aerodynamic velocity seen by the current control point (matlab axes)
         mesh["Vinf"][k, :] = np.squeeze(Vref_m - Vrot_m)
         mesh["Vinf2"][k, :] = np.squeeze(Vref_m - Vrot_m2)
+    
+    mesh["Vinf"] = np.ascontiguousarray(mesh["Vinf"])
+    mesh["Vinf2"] = np.ascontiguousarray(mesh["Vinf2"])
 
     state["delta0_f"] = np.zeros(2)
     state["delta0_f"][0] = model["canopy"]["cs"]["deflection"]["L"]
@@ -96,7 +125,7 @@ def vortxl(X1, X2, XP, gamma):
         inv_r1xr2 = 0
     else:
         inv_r1xr2 = 1.0 / norm_r1xr2
-    
+
     if norm_r1 == 0:
         inv_r1 = 0
     else:
@@ -145,50 +174,62 @@ def HVM(model: dict, state: dict):
         normals[2, i] = dz*aux
 
     # Equations and Biot - Savart law
+    normals = np.ascontiguousarray(normals)
     A = np.zeros((mesh["N"], mesh["N"]))
+    A = np.ascontiguousarray(A)
     B = np.zeros((mesh["N"], 1))
+    B = np.ascontiguousarray(B)
     b = model["canopy"]["span"]
-    one = 1.0
-    xa = np.zeros(3)
-    xb = np.zeros(3)
-    xc = np.zeros(3)
-    xd = np.zeros(3)
-    for j in range(mesh["N"]):
-        xp = mesh["xctrl"][:, j]
-        nunit = normals[:, j]
-        for k in range(mesh["N"]):
-            xb[0] = mesh["xbound"][0, k]
-            xa[0] = xb[0] + 20*b
-            xc[0] = xb[0]
-            xd[0] = xa[0]
+    lol.biot_savart(mesh["N"],
+                    b,
+                    A,
+                    B,
+                    normals,
+                    mesh["xctrl"],
+                    mesh["xbound"],
+                    mesh["coord"],
+                    mesh["Vinf"])
+    # one = 1.0
+    # xa = np.zeros(3)
+    # xb = np.zeros(3)
+    # xc = np.zeros(3)
+    # xd = np.zeros(3)
+    # for j in range(mesh["N"]):
+    #     xp = mesh["xctrl"][:, j]
+    #     nunit = normals[:, j]
+    #     for k in range(mesh["N"]):
+    #         xb[0] = mesh["xbound"][0, k]
+    #         xa[0] = xb[0] + 20*b
+    #         xc[0] = xb[0]
+    #         xd[0] = xa[0]
 
-            xb[1] = mesh["coord"][1, k]
-            xa[1] = xb[1]
-            xc[1] = mesh["coord"][1, k+1]
-            xd[1] = xc[1]
+    #         xb[1] = mesh["coord"][1, k]
+    #         xa[1] = xb[1]
+    #         xc[1] = mesh["coord"][1, k+1]
+    #         xd[1] = xc[1]
 
-            xb[2] = (mesh["xbound"][2, k] -
-                     (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-            xa[2] = xb[2]
-            xc[2] = (mesh["xbound"][2, k] +
-                     (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-            xd[2] = xc[2]
-            xa = xa[:]
-            xb = xb[:]
-            xc = xc[:]
-            xd = xd[:]
+    #         xb[2] = (mesh["xbound"][2, k] -
+    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
+    #         xa[2] = xb[2]
+    #         xc[2] = (mesh["xbound"][2, k] +
+    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
+    #         xd[2] = xc[2]
+    #         xa = xa[:]
+    #         xb = xb[:]
+    #         xc = xc[:]
+    #         xd = xd[:]
 
-            # First trailing vortex
-            uind1 = vortxl(xa, xb, xp, one)
-            # Bounded vortex
-            uind2 = vortxl(xb, xc, xp, one)
-            # Second trailing vortex
-            uind3 = vortxl(xc, xd, xp, one)
+    #         # First trailing vortex
+    #         uind1 = vortxl(xa, xb, xp, one)
+    #         # Bounded vortex
+    #         uind2 = vortxl(xb, xc, xp, one)
+    #         # Second trailing vortex
+    #         uind3 = vortxl(xc, xd, xp, one)
 
-            uindt = uind1+uind2+uind3
-            A[j, k] = np.dot(uindt, nunit)
-        uinf = -mesh["Vinf"][j, :]
-        B[j, 0] = -np.dot(uinf, nunit)
+    #         uindt = uind1+uind2+uind3
+    #         A[j, k] = np.dot(uindt, nunit)
+    #     uinf = -mesh["Vinf"][j, :]
+    #     B[j, 0] = -np.dot(uinf, nunit)
     # Circulation
     try:
         Circ = np.linalg.solve(A, B)

@@ -44,4 +44,7 @@ def mesh_initialization(model: dict, state: dict):
         mesh["alphalo"][i] = (
             a0["root"] + (a0["tip"]-a0["root"]) * mesh["ypos"][i])
 
+    for param in ("coord", "xctrl", "xbound", "len", "s", "alphalo", "ypos"):
+        mesh[param] = np.ascontiguousarray(mesh[param])
+
     state["mesh"] = mesh
