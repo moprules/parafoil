@@ -91,6 +91,8 @@ class PFSim:
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
 
+        self.ans_file = open("ans.txt", "w")
+
         self.print_state()
 
     def start(self):
@@ -100,13 +102,17 @@ class PFSim:
         self.init_state()
         # Цикл расчёта
         self.loop()
+        self.ans_file.close()
 
     def print_state(self):
         time = self.state["time"]
         pos_north = self.state["pos_north"]
         pos_east = self.state["pos_east"]
         altitude = self.state["altitude"]
-        print(f"{time:<7.3f} -> {pos_north} {pos_east} {altitude}")
+
+        msg = f"{time:<7.3f} -> {pos_north} {pos_east} {altitude}"
+        print(msg)
+        print(msg, file=self.ans_file)
 
     def step(self):
         sim.simulate_state(self.model, self.state)
@@ -180,6 +186,7 @@ class PFSim:
         self.print_state()
 
         pass
+
     def loop(self):
         while self.state["time"] < self.model["time"]["final"] and self.state["altitude"] > 0:
             self.step()
