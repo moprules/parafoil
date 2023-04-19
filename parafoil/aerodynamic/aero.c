@@ -9,7 +9,7 @@ void print_matrix(double *M, int rows, int cols)
     {
         for (int j = 0; j < cols; j++)
         {
-            printf("%6.3f", *(M + i * cols + j));
+            printf("%10g", *(M + i * cols + j));
         }
         printf("\n");
     }
@@ -251,11 +251,7 @@ void kutta_joukowsky(int N, double b, double Rho, double *local_force, double *x
             // xc = coord[:, j+1]
             xc[r] = *(coord + r * (N + 1) + j + 1);
         }
-        // if (1)
-        // {
-        //     printf("xb = ");
-        //     print_matrix(xb, 1, 3);
-        // }
+
         // Gamma is per unit lenght
         v_diff(d_g, xc, xb);
         v_mult(d_g, d_g, *(Circ + j * 1 + 0));

@@ -164,47 +164,6 @@ def HVM(model: dict, state: dict):
                      mesh["xbound"],
                      mesh["coord"],
                      mesh["Vinf"])
-    # one = 1.0
-    # xa = np.zeros(3)
-    # xb = np.zeros(3)
-    # xc = np.zeros(3)
-    # xd = np.zeros(3)
-    # for j in range(mesh["N"]):
-    #     xp = mesh["xctrl"][:, j]
-    #     nunit = normals[:, j]
-    #     for k in range(mesh["N"]):
-    #         xb[0] = mesh["xbound"][0, k]
-    #         xa[0] = xb[0] + 20*b
-    #         xc[0] = xb[0]
-    #         xd[0] = xa[0]
-
-    #         xb[1] = mesh["coord"][1, k]
-    #         xa[1] = xb[1]
-    #         xc[1] = mesh["coord"][1, k+1]
-    #         xd[1] = xc[1]
-
-    #         xb[2] = (mesh["xbound"][2, k] -
-    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    #         xa[2] = xb[2]
-    #         xc[2] = (mesh["xbound"][2, k] +
-    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    #         xd[2] = xc[2]
-    #         xa = xa[:]
-    #         xb = xb[:]
-    #         xc = xc[:]
-    #         xd = xd[:]
-
-    #         # First trailing vortex
-    #         uind1 = vortxl(xa, xb, xp, one)
-    #         # Bounded vortex
-    #         uind2 = vortxl(xb, xc, xp, one)
-    #         # Second trailing vortex
-    #         uind3 = vortxl(xc, xd, xp, one)
-
-    #         uindt = uind1+uind2+uind3
-    #         A[j, k] = np.dot(uindt, nunit)
-    #     uinf = -mesh["Vinf"][j, :]
-    #     B[j, 0] = -np.dot(uinf, nunit)
     # Circulation
     try:
         Circ = np.linalg.solve(A, B)
@@ -222,54 +181,6 @@ def HVM(model: dict, state: dict):
                          mesh["coord"],
                          Circ,
                          mesh["Vinf2"])
-    # local_force = np.zeros((3, mesh["N"]))
-    # # local_force = np.ascontiguousarray(local_force)
-    # xa = np.zeros(3)
-    # xb = np.zeros(3)
-    # xc = np.zeros(3)
-    # xd = np.zeros(3)
-    # for j in range(mesh["N"]):
-    #     xp = mesh["xbound"][:, j]
-    #     Wk = np.zeros(3)
-    #     for k in range(mesh["N"]):
-    #         xb[0] = mesh["xbound"][0, k]
-    #         xa[0] = xb[0] + 20*b
-    #         xc[0] = xb[0]
-    #         xd[0] = xa[0]
-
-    #         xb[1] = mesh["coord"][1, k]
-    #         xa[1] = xb[1]
-    #         xc[1] = mesh["coord"][1, k+1]
-    #         xd[1] = xc[1]
-
-    #         xb[2] = (mesh["xbound"][2, k] -
-    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    #         xa[2] = xb[2]
-    #         xc[2] = (mesh["xbound"][2, k] +
-    #                  (mesh["coord"][2, k+1]-mesh["coord"][2, k])/2)
-    #         xd[2] = xc[2]
-    #         xa = xa[:]
-    #         xb = xb[:]
-    #         xc = xc[:]
-    #         xd = xd[:]
-
-    #         # First trailing vortex
-    #         wkind1 = vortxl(xa, xb, xp, Circ[k])
-    #         # Second trailing vortex
-    #         wkind3 = vortxl(xc, xd, xp, Circ[k])
-
-    #         # Down Wash
-    #         Wk = Wk + wkind1 + wkind3
-    #     uinf = -mesh["Vinf2"][j, :]
-    #     # Induced + Kinematic velocity
-    #     v_i = Wk + uinf
-    #     # Bound vortex
-    #     xb = mesh["coord"][:, j]
-    #     xc = mesh["coord"][:, j+1]
-    #     # Gamma is per unit lenght
-    #     d_g = (xc-xb)*Circ[j]
-    #     # KJ
-    #     local_force[:, j] = np.cross(v_i, d_g)*state["Rho"]
 
     # Aerodynamic forces and moments according to HVM
     tot_force = np.zeros(6)
