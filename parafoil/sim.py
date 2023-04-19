@@ -89,8 +89,8 @@ def simulate_state(model: dict, state: dict):
           state["Wb"][0, 0],
           state["Wb"][1, 0],
           state["Wb"][2, 0],
-          state["pos_east"],
           state["pos_north"],
+          state["pos_east"],
           state["altitude"]]
 
     T = state["time"]
@@ -116,8 +116,8 @@ def simulate_state(model: dict, state: dict):
      state["Wb"][0, 0],
      state["Wb"][1, 0],
      state["Wb"][2, 0],
-     state["pos_east"],
      state["pos_north"],
+     state["pos_east"],
      state["altitude"]] = Xe
 
     state["time"] = round(T, get_precision(DT))
@@ -125,6 +125,8 @@ def simulate_state(model: dict, state: dict):
     matrix.matrices_definition(state)
 
     # Reference velocity definition
+    # Vwind_b = i2b*Vwind;
+    state["Vwind_b"] = state["i2b"].dot(state["Vwind"])
     state["Vref_b"] = state["Vwind_b"]-state["Vcg_b"]
     state["Vrefn"] = np.sqrt(state["Vref_b"][0]**2 +
                              state["Vref_b"][1]**2+state["Vref_b"][2]**2)

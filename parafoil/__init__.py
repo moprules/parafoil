@@ -91,7 +91,7 @@ class PFSim:
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
 
-        print(self.state["time"], self.state["pos_north"], self.state["pos_east"], self.state["altitude"])
+        self.print_state()
 
     def start(self):
         # Собираем модель при первом запуске
@@ -100,6 +100,13 @@ class PFSim:
         self.init_state()
         # Цикл расчёта
         self.loop()
+
+    def print_state(self):
+        time = self.state["time"]
+        pos_north = self.state["pos_north"]
+        pos_east = self.state["pos_east"]
+        altitude = self.state["altitude"]
+        print(f"{time:<7.3f} -> {pos_north} {pos_east} {altitude}")
 
     def step(self):
         sim.simulate_state(self.model, self.state)
@@ -170,7 +177,7 @@ class PFSim:
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
 
-        print(self.state["time"], self.state["pos_north"], self.state["pos_east"], self.state["altitude"])
+        self.print_state()
 
         pass
     def loop(self):

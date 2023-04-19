@@ -17,9 +17,9 @@ def mesh_initialization(model: dict, state: dict):
         theta = np.pi * i / mesh["N"]
         mesh["coord"][2][i] = -canopy["height"] * abs(1-np.sin(theta))
         mesh["coord"][1][i] = -0.5 * canopy["span"] * np.cos(theta)
-        c[i] = canopy["root_chord"] - 2 * abs(mesh["coord"][2][i]) * (
+        c[i] = canopy["root_chord"] - 2 * abs(mesh["coord"][1][i]) * (
             canopy["root_chord"] - canopy["tip_chord"])/(0.5*canopy["span"])
-        mesh["coord"][0][i] = abs(mesh["coord"][2][i]) * tan_sw
+        mesh["coord"][0][i] = abs(mesh["coord"][1][i]) * tan_sw
 
     mesh["xctrl"] = np.zeros((3, mesh["N"]))
     mesh["xbound"] = np.zeros((3, mesh["N"]))
@@ -40,7 +40,7 @@ def mesh_initialization(model: dict, state: dict):
     mesh["ypos"] = np.zeros(mesh["N"])
     a0 = canopy["a0"]
     for i in range(mesh["N"]):
-        mesh["ypos"][i] = 2.0 * abs(mesh["xbound"][2][i])/canopy["span"]
+        mesh["ypos"][i] = 2.0 * abs(mesh["xbound"][1,i])/canopy["span"]
         mesh["alphalo"][i] = (
             a0["root"] + (a0["tip"]-a0["root"]) * mesh["ypos"][i])
 
