@@ -128,4 +128,4 @@ planet:
 time:
   init: 0 # sec
   final: 10500 # sec
-  step: 0.01 # sec
+  step: 0.005 # sec
