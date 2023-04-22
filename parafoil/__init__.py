@@ -91,7 +91,13 @@ class PFSim:
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
 
-        self.ans_file = open("ans.txt", "w")
+        self.ans_file = open("grafics/ans.txt", "w")
+        print("name: Trajectory 2", file=self.ans_file)
+        print("type: 3D", file=self.ans_file)
+        print("x: North | m", file=self.ans_file)
+        print("y: East  | m", file=self.ans_file)
+        print("z: Altitude | m", file=self.ans_file)
+        print("coords:", file=self.ans_file)
 
         self.print_state()
 
@@ -182,6 +188,9 @@ class PFSim:
 
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
+
+        if self.state["altitude"] < 0:
+            self.state["altitude"] = 0
 
         self.print_state()
 
