@@ -9,7 +9,7 @@ import ctypes
 from numpy.ctypeslib import ndpointer
 
 # Тип данных для трансляции двумерных массивов numpy в массивы на си
-с_arr2d = ndpointer(dtype=ctypes.c_double, ndim=2, flags='C_CONTIGUOUS')
+c_arr2d = ndpointer(dtype=ctypes.c_double, ndim=2, flags='C_CONTIGUOUS')
 
 # Загружаем библиотеку aero - расчёт аэродинамики в СИ
 aero = load_lib("aero", __file__)
@@ -19,13 +19,13 @@ aero = load_lib("aero", __file__)
 aero.biot_savart.restype = None
 aero.biot_savart.argtypes = [ctypes.c_int,      # N
                              ctypes.c_double,   # b
-                             с_arr2d,           # A
-                             с_arr2d,           # B
-                             с_arr2d,           # normals
-                             с_arr2d,           # xctrl
-                             с_arr2d,           # xbound
-                             с_arr2d,           # coord
-                             с_arr2d]           # Vinf
+                             c_arr2d,           # A
+                             c_arr2d,           # B
+                             c_arr2d,           # normals
+                             c_arr2d,           # xctrl
+                             c_arr2d,           # xbound
+                             c_arr2d,           # coord
+                             c_arr2d]           # Vinf
 
 # Назначаем параметры функции расчёта Kutta-Joukowsky
 # Функция ничего не возвращает
@@ -33,10 +33,10 @@ aero.kutta_joukowsky.restype = None
 aero.kutta_joukowsky.argtypes = [ctypes.c_int,      # N
                                  ctypes.c_double,   # b
                                  ctypes.c_double,   # Rho
-                                 с_arr2d,           # local_force
-                                 с_arr2d,           # xbound
-                                 с_arr2d,           # coord
-                                 с_arr2d,           # Circ
-                                 с_arr2d]           # Vinf2
+                                 c_arr2d,           # local_force
+                                 c_arr2d,           # xbound
+                                 c_arr2d,           # coord
+                                 c_arr2d,           # Circ
+                                 c_arr2d]           # Vinf2
 
 __all__ = ["aero"]
