@@ -7,8 +7,12 @@ def control(model: dict, state: dict):
     # состояние автопилота
     ap = state["ap"]
 
-    position_target_north = (model["target"]["north"] - state["pos_north"])
-    position_target_east = (model["target"]["east"] - state["pos_east"])
+    # position_target_north = (model["target"]["north"] - state["pos_north"])
+    # position_target_east = (model["target"]["east"] - state["pos_east"])
+
+    position_target_north = model["target"]["init_north"]
+    position_target_east = model["target"]["init_east"]
+
     i2t = matrix.inertia_track(position_target_north, position_target_east)
 
     # From body to inertia axes
@@ -85,7 +89,7 @@ def control(model: dict, state: dict):
                             ap["Ki"]*ap["heading_sumerr"] +
                             ap["Kd"]*heading_derr)
         yaw_rate_command = desired_yaw_rate - state["Wb"][2, 0]
-        yaw_rate_sign = 1 if yaw_rate_command >= 0 else -1
+        yaw_rate_sign = np.sign(yaw_rate_command)
         if abs(yaw_rate_command) > ap["max_yaw_rate"]:
             if state["ctrl"]:
                 yaw_rate_command = (yaw_rate_sign *

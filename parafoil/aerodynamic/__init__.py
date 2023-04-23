@@ -210,7 +210,7 @@ def HVM(model: dict, state: dict):
     CDp = CDp/model["canopy"]["Sref"]
     Vrefu = Uref_m / np.sqrt(np.dot(Uref_m, Uref_m))
     tot_force[:3] = tot_force[:3] + qq*model["canopy"]["Sref"]*CDp*Vrefu
-    # tot_force = np.round(tot_force,10);
+    tot_force = np.round(tot_force, 10)
 
     # Total aerodynamic forces and moments of the canopy
     aero_force_canopy = tot_force[:3]

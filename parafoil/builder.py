@@ -125,6 +125,6 @@ def prepare_target(model: dict):
     target = model["target"]
     body = model["body"]
 
-    pos_north = (target["north"] - body["north"])
-    pos_east = (target["east"] - body["east"])
-    target["init_dist"] = (pos_north**2+pos_east**2)**0.5
+    target["init_north"] = (target["north"] - body["north"])
+    target["init_east"] = (target["east"] - body["east"])
+    target["init_dist"] = (target["init_north"]**2+target["init_east"]**2)**0.5
