@@ -6,28 +6,41 @@ from . import mesh
 from . import aerodynamic
 from . import sim
 from . import autopilot
+from . import store
 import yaml
+import os
+import shutil
 import numpy as np
+import datetime
 
 
 class PFSim:
     """Класс - симулятор парафойла"""
 
-    def __init__(self, path_to_data: str = ""):
-        self.params = {}
-        self.state = {}
-        self.model = {}
+    def __init__(self, path_to_data: str = "", path_to_res: str = ""):
+        self.params: dict = {}
+        self.state: dict = {}
+        self.model: dict = {}
+        self.files: dict = {}
+        self.path_to_data = os.path.abspath(path_to_data)
+        self.path_to_res = os.path.abspath(path_to_res)
 
         if path_to_data:
             self.load(path_to_data)
 
-    def load(self, path_to_data: str):
+    def load(self, path_to_data: str = ""):
         """Загрузка параметров из исходного файла"""
-        with open(path_to_data, "r") as stream:
+        if path_to_data:
+            self.path_to_data = os.path.abspath(path_to_data)
+        with open(self.path_to_data, "r") as stream:
             self.params = yaml.safe_load(stream)
 
     def build(self):
         self.model = builder.build(self.params)
+
+    def init_files(self):
+        store.init_files(self.files, self.path_to_res)
+        store.init_coords(self.files, self.model)
 
     def init_state(self):
         # Новый словарь состояний
@@ -91,15 +104,10 @@ class PFSim:
         viner = self.state["i2b"].transpose().dot(self.state["Vcg_b"])
         self.state["trajv"] = np.arctan(viner[2, 0]/viner[0, 0])
 
-        self.ans_file = open("grafics/ans.txt", "w")
-        print("name: Trajectory 2", file=self.ans_file)
-        print("type: 3D", file=self.ans_file)
-        print("x: North | m", file=self.ans_file)
-        print("y: East  | m", file=self.ans_file)
-        print("z: Altitude | m", file=self.ans_file)
-        print("coords:", file=self.ans_file)
-
-        self.print_state()
+        # Создаём файлы расчётов
+        self.init_files()
+        # Первая точка t = 0
+        store.store(self.files, self.state)
 
     def start(self):
         # Собираем модель при первом запуске
@@ -108,17 +116,6 @@ class PFSim:
         self.init_state()
         # Цикл расчёта
         self.loop()
-        self.ans_file.close()
-
-    def print_state(self):
-        time = self.state["time"]
-        pos_north = self.state["pos_north"]
-        pos_east = self.state["pos_east"]
-        altitude = self.state["altitude"]
-
-        msg = f"{time:<7.3f} -> {pos_north} {pos_east} {altitude}"
-        print(msg)
-        print(msg, file=self.ans_file)
 
     def step(self):
         sim.simulate_state(self.model, self.state)
@@ -192,13 +189,12 @@ class PFSim:
         if self.state["altitude"] < 0:
             self.state["altitude"] = 0
 
-        self.print_state()
-
-        pass
+        # В конце каждого шага сохраняем данные
+        store.store(self.files, self.state)
 
     def loop(self):
         while self.state["time"] < self.model["time"]["final"] and self.state["altitude"] > 0:
             self.step()
-
-    def __str__(self):
-        return str(self.params)
+        # Закрываем все открытые файлы
+        for key in self.files:
+            self.files[key].close()

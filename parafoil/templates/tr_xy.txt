@@ -1,0 +1,4 @@
+name: Trajectory North-East
+type: 2D
+x: North | m
+y: East  | m

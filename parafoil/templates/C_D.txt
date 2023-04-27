@@ -1,0 +1,4 @@
+name: C_D
+type: 2D
+x: t | sec
+y: C_D  |

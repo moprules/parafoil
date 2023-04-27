@@ -1,0 +1,4 @@
+name: Trajectory North-Altitude
+type: 2D
+x: North | m
+y: Altitude  | m

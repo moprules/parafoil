@@ -1,0 +1,5 @@
+name: Trajectory 3D
+type: 3D
+x: North | m
+y: East  | m
+z: Altitude | m

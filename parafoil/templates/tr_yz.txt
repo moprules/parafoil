@@ -1,0 +1,4 @@
+name: Trajectory East-Altitude
+type: 2D
+x: East | m
+y: Altitude  | m

@@ -1,0 +1,4 @@
+name: Gamma
+type: 2D
+x: t | sec
+y: gamma  | deg

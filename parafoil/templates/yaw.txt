@@ -1,0 +1,4 @@
+name: Yaw
+type: 2D
+x: t | sec
+y: yaw  | deg
