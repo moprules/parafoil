@@ -1,3 +1,24 @@
+target:
+  altitude: 0 # m
+  north: 1100 # m
+  east: -1900 # m
+  radius:  50 # m
+
+planet:
+  R: 6371000 # м
+  Rho0: 1.225 # kg/m^3
+  g0: 9.80665 # m/sec^2
+
+wind: # Wind velocity in inertia frame
+  x: 0.0 # m/sec
+  y: 0.0 # m/sec
+  z: 0.0 # m/sec
+
+time:
+  init: 0 # sec
+  final: 10500 # sec
+  step: 0.005 # sec
+
 body:
   altitude: 2000 # m
   east: 0 # m
@@ -92,16 +113,6 @@ canopy:
       - 0.80
       - 0.90
 
-wind: # Wind velocity in inertia frame
-  x: 0.0 # m/sec
-  y: 0.0 # m/sec
-  z: 0.0 # m/sec
-
-target:
-  altitude: 0 # m
-  north: 1100 # m
-  east: -1900 # m
-
 autopilot:
   tol_angle: 0.05 # deg
   roll_gain: 1
@@ -119,13 +130,3 @@ autopilot:
   incidence_gain: 1
   incidence_lower_limit: -0.15 # deg
   incidence_upper_limit: 0.15 # deg
-
-planet:
-  R: 6371000 # м
-  Rho0: 1.225 # kg/m^3
-  g0: 9.80665 # m/sec^2
-
-time:
-  init: 0 # sec
-  final: 10500 # sec
-  step: 0.005 # sec
