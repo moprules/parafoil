@@ -6,13 +6,15 @@ import shutil
 PKG_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def init_files(files: dict = {}, path_to_res: str = ""):
+def init_files(files: dict = {}, path_to_res: str = "", path_to_model: str = ""):
     path_to_res = os.path.abspath(path_to_res)
+    model_prefix = os.path.basename(path_to_model)
+    model_prefix = os.path.splitext(model_prefix)[0]
     now = datetime.datetime.now()
-    res_folder = now.strftime("%Y-%m-%d_%H.%M")
+    res_folder = model_prefix + now.strftime("%Y-%m-%d_%H.%M")
     res_folder = os.path.join(path_to_res, res_folder)
     if os.path.exists(res_folder):
-        shutil.rmtree(res_folder)    
+        shutil.rmtree(res_folder)
     shutil.copytree(os.path.join(PKG_DIR, "templates"), res_folder)
 
     # Заполняем словарь файлов обхектами файлов

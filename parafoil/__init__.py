@@ -9,37 +9,35 @@ from . import autopilot
 from . import store
 import yaml
 import os
-import shutil
 import numpy as np
-import datetime
 
 
 class PFSim:
     """Класс - симулятор парафойла"""
 
-    def __init__(self, path_to_data: str = "", path_to_res: str = ""):
+    def __init__(self, path_to_model: str = "", path_to_res: str = ""):
         self.params: dict = {}
         self.state: dict = {}
         self.model: dict = {}
         self.files: dict = {}
-        self.path_to_data = os.path.abspath(path_to_data)
+        self.path_to_model = os.path.abspath(path_to_model)
         self.path_to_res = os.path.abspath(path_to_res)
 
-        if path_to_data:
-            self.load(path_to_data)
+        if path_to_model:
+            self.load(path_to_model)
 
-    def load(self, path_to_data: str = ""):
+    def load(self, path_to_model: str = ""):
         """Загрузка параметров из исходного файла"""
-        if path_to_data:
-            self.path_to_data = os.path.abspath(path_to_data)
-        with open(self.path_to_data, "r") as stream:
+        if path_to_model:
+            self.path_to_model = os.path.abspath(path_to_model)
+        with open(self.path_to_model, "r") as stream:
             self.params = yaml.safe_load(stream)
 
     def build(self):
         self.model = builder.build(self.params)
 
     def init_files(self):
-        store.init_files(self.files, self.path_to_res)
+        store.init_files(self.files, self.path_to_res, self.path_to_model)
         store.init_coords(self.files, self.model)
 
     def init_state(self):
