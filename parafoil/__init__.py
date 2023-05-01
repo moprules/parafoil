@@ -196,3 +196,7 @@ class PFSim:
         # Закрываем все открытые файлы
         for key in self.files:
             self.files[key].close()
+    
+    def closeFiles(self):
+        for key in self.files:
+            self.files[key].close()
