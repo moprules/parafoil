@@ -1,4 +1,4 @@
 name: C_L
 type: 2D
-x: t | sec
+x: t | с
 y: C_L  |

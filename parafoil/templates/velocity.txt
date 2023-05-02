@@ -1,4 +1,4 @@
 name: Velocity
 type: 2D
-x: t | sec
-y: V  | m/sec
+x: t | с
+y: V  | м/с

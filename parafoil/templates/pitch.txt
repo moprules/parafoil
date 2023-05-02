@@ -1,4 +1,4 @@
 name: Pitch
 type: 2D
-x: t | sec
-y: pitch  | deg
+x: t | с
+y: pitch  | град
