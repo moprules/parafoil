@@ -10,13 +10,13 @@ def velocity_initialization(model: dict, state: dict):
 
     state["Vwind_b"] = state["i2b"].dot(state["Vwind"])
     state["Vref_b"] = state["Vwind_b"]-state["Vcg_b"]
-    state["Vrefn"] = np.sqrt(state["Vref_b"][0]**2 +
-                             state["Vref_b"][1]**2+state["Vref_b"][2]**2)
+    state["Vrefn"] = np.sqrt(state["Vref_b"][0, 0]**2 +
+                             state["Vref_b"][1, 0]**2+state["Vref_b"][2, 0]**2)
     state["Vref_m"] = state["m2c"].transpose().dot(
         state["b2c"].dot(state["Vref_b"]))
-    state["alpha"] = np.arctan(state["Vref_b"][2]/state["Vref_b"][0])
+    state["alpha"] = np.arctan(state["Vref_b"][2, 0]/state["Vref_b"][0, 0])
     state["prev"]["alpha"] = state["alpha"]
-    state["sideslip_angle"] = np.arcsin(state["Vref_b"][1]/state["Vrefn"])
+    state["sideslip_angle"] = np.arcsin(state["Vref_b"][1, 0]/state["Vrefn"])
 
     cr = model["canopy"]["root_chord"]
     state["Xcg_aero"] = (model["canopy"]["Xref_b"] +
