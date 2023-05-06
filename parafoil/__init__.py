@@ -163,7 +163,7 @@ class PFSim:
         w2b[0, 1] = -np.cos(alpha)*np.sin(sideslip_angle)
         w2b[0, 2] = -np.sin(alpha)
         w2b[1, 0] = np.sin(sideslip_angle)
-        w2b[1, 2] = np.cos(sideslip_angle)
+        w2b[1, 1] = np.cos(sideslip_angle)
         w2b[1, 2] = 0
         w2b[2, 0] = np.sin(alpha)*np.cos(sideslip_angle)
         w2b[2, 1] = -np.sin(alpha)*np.sin(sideslip_angle)

@@ -30,7 +30,7 @@ def velocity_initialization(model: dict, state: dict):
     w2b[0, 1] = -np.cos(state["alpha"])*np.sin(state["sideslip_angle"])
     w2b[0, 2] = -np.sin(state["alpha"])
     w2b[1, 0] = np.sin(state["sideslip_angle"])
-    w2b[1, 2] = np.cos(state["sideslip_angle"])
+    w2b[1, 1] = np.cos(state["sideslip_angle"])
     w2b[1, 2] = 0
     w2b[2, 0] = np.sin(state["alpha"])*np.cos(state["sideslip_angle"])
     w2b[2, 1] = -np.sin(state["alpha"])*np.sin(state["sideslip_angle"])
@@ -75,49 +75,6 @@ def velocity_initialization(model: dict, state: dict):
     state["delta0_f"][0] = model["canopy"]["cs"]["deflection"]["L"]
     state["delta0_f"][1] = model["canopy"]["cs"]["deflection"]["R"]
     state["Uref_m"] = state["Vref_m"].transpose()
-
-
-def vortxl(X1, X2, XP, gamma):
-    x1 = X1[0]
-    y1 = X1[1]
-    z1 = X1[2]
-    x2 = X2[0]
-    y2 = X2[1]
-    z2 = X2[2]
-    xp = XP[0]
-    yp = XP[1]
-    zp = XP[2]
-    r0 = X2-X1
-    r1 = XP-X1
-    r2 = XP-X2
-    norm_r1 = np.linalg.norm(r1)
-    norm_r2 = np.linalg.norm(r2)
-
-    r1xr2 = np.cross(r1, r2)
-    norm_r1xr2 = np.linalg.norm(r1xr2)
-
-    if norm_r1xr2 == 0:
-        inv_r1xr2 = 0
-    else:
-        inv_r1xr2 = 1.0 / norm_r1xr2
-
-    if norm_r1 == 0:
-        inv_r1 = 0
-    else:
-        inv_r1 = 1.0 / norm_r1
-
-    if norm_r2 == 0:
-        inv_r2 = 0
-    else:
-        inv_r2 = 1.0 / norm_r2
-
-    a = r0 * inv_r1xr2
-    b = r1*inv_r1 - r2*inv_r2
-    c = np.dot(a, b)
-
-    u = gamma*0.25/np.pi*c*np.dot(r1xr2, inv_r1xr2)
-
-    return u
 
 
 def HVM(model: dict, state: dict):
