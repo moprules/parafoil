@@ -65,8 +65,9 @@ def payload_loads_contribution(model: dict, state: dict):
                         + (state["Vcg_b"] - state["i2b"].dot(state["Vwind"])))
 
     # Payload dynamic pressure
-    [q] = 0.5*state["Rho"]*np.sqrt(velocity_payload[0] **
-                                   2 + velocity_payload[1]**2 + velocity_payload[2]**2)
+    [q] = 0.5*state["Rho"]*np.sqrt(velocity_payload[0]**2 +
+                                   velocity_payload[1]**2 +
+                                   velocity_payload[2]**2)
     pass
 
     # Payload force calculation
