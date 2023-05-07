@@ -8,7 +8,7 @@ def apparent_mass_matrices(model: dict):
     cref = model["canopy"]["ref_chord"]
     Sref_canopy = model["canopy"]["Sref"]
     AR = model["canopy"]["AR"]
-    A = 0.66*(1+(8/3)*(a/b)**2)*t**2*b
+    A = 0.666*(1+(8/3)*(a/b)**2)*t**2*b
     B = 0.267*(t**2 + 2*(a**2)*(1 - (t/cref)**2))*cref
 
     inv = 1/(1+AR)
