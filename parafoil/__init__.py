@@ -127,7 +127,7 @@ class PFSim:
         d_roll = self.state["roll"] - self.state["prev"]["roll"]
         d_yaw = self.state["yaw"] - self.state["prev"]["yaw"]
         if abs(d_alpha) > tol_angle or abs(d_pitch) > tol_angle or abs(d_roll) > tol_angle or abs(d_yaw) > tol_angle:
-            self.state["Uref_m"] = self.state["Vref_m"].transpose()
+            self.state["Uref_m"] = self.state["Vref_m"].transpose()[0]
             # HVM
             aerodynamic.HVM(self.model, self.state)
             self.state["prev"]["alpha"] = self.state["alpha"]

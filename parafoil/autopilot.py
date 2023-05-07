@@ -47,7 +47,7 @@ def control(model: dict, state: dict):
 
     # JUST GLIDE WITHOUT ALTITUDE CONTROL BEFORE REACHING 50% OF TARGET DISTANCE
     if state["dlost_altitude"] == 0:
-        glide_ratio = -0
+        glide_ratio = -np.inf
     else:
         glide_ratio = -state["dtrav_dist"]/state["dlost_altitude"]
     glide_ratio_ideal = distance_to_target2/(state["altitude"]+10)
@@ -56,7 +56,7 @@ def control(model: dict, state: dict):
     ap["lasterr"] = err
     if distance_to_target_ratio > ap["altitude_control_activation"]:
         if state["dlost_altitude"] == 0:
-            glide_ratio = -0
+            glide_ratio = -np.inf
         else:
             glide_ratio = -state["dtrav_dist"]/state["dlost_altitude"]
         ap["loiter_decision_altitude"] = distance_to_target/glide_ratio

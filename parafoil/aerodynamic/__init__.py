@@ -74,7 +74,7 @@ def velocity_initialization(model: dict, state: dict):
     state["delta0_f"] = np.zeros(2)
     state["delta0_f"][0] = model["canopy"]["cs"]["deflection"]["L"]
     state["delta0_f"][1] = model["canopy"]["cs"]["deflection"]["R"]
-    state["Uref_m"] = state["Vref_m"].transpose()
+    state["Uref_m"] = state["Vref_m"].transpose()[0]
 
 
 def HVM(model: dict, state: dict):
