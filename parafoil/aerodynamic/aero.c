@@ -243,38 +243,38 @@ void kutta_joukowsky(int N, double b, double Rho, double *local_force, double *x
         for (size_t r = 0; r < 3; r++)
         {
             // xp[r] = xbound[r, j];
-            xp[r] = *(xbound + r * N + j);
+            xp[r] = xbound[r * N + j];
             Wk[r] = 0;
-            uinf[r] = -*(Vinf2 + j * 3 + r);
+            uinf[r] = -Vinf2[j * 3 + r];
         }
         for (size_t k = 0; k < N; k++)
         {
             // xb[0] = xbound[0, k];
-            xb[0] = *(xbound + 0 * N + k);
+            xb[0] = xbound[0 * N + k];
             xa[0] = xb[0] + 20 * b;
             xc[0] = xb[0];
             xd[0] = xa[0];
 
             // xb[1] = coord[1, k];
-            xb[1] = *(coord + 1 * (N + 1) + k);
+            xb[1] = coord[1 * (N + 1) + k];
             xa[1] = xb[1];
             // xc[1] = coord[1, k + 1];
-            xc[1] = *(coord + 1 * (N + 1) + k + 1);
+            xc[1] = coord[1 * (N + 1) + k + 1];
             xd[1] = xc[1];
 
             // (coord[2, k + 1] - coord[2, k]) / 2
-            coord_diff = (*(coord + 2 * (N + 1) + k + 1) - *(coord + 2 * (N + 1) + k)) / 2;
+            coord_diff = (coord[2 * (N + 1) + k + 1] - coord[2 * (N + 1) + k]) / 2;
             // xbound[2,k] - coord_diff
-            xb[2] = *(xbound + 2 * N + k) - coord_diff;
+            xb[2] = xbound[2 * N + k] - coord_diff;
             xa[2] = xb[2];
             // xbound[2,k] + coord_diff
-            xc[2] = *(xbound + 2 * N + k) + coord_diff;
+            xc[2] = xbound[2 * N + k] + coord_diff;
             xd[2] = xc[2];
 
             // First trailing vortex
-            vortxl(wkind1, xa, xb, xp, *(Circ + k * 1 + 0));
+            vortxl(wkind1, xa, xb, xp, Circ[k * 1 + 0]);
             // Second trailing vortex
-            vortxl(wkind3, xc, xd, xp, *(Circ + k * 1 + 0));
+            vortxl(wkind3, xc, xd, xp, Circ[k * 1 + 0]);
 
             // Down Wash
             v_sum(Wk, Wk, wkind1);
@@ -288,21 +288,21 @@ void kutta_joukowsky(int N, double b, double Rho, double *local_force, double *x
         for (size_t r = 0; r < 3; r++)
         {
             // xb = coord[:, j]
-            xb[r] = *(coord + r * (N + 1) + j);
+            xb[r] = coord[r * (N + 1) + j];
             // xc = coord[:, j+1]
-            xc[r] = *(coord + r * (N + 1) + j + 1);
+            xc[r] = coord[r * (N + 1) + j + 1];
         }
 
         // Gamma is per unit lenght
         v_diff(d_g, xc, xb);
-        v_mult(d_g, d_g, *(Circ + j * 1 + 0));
+        v_mult(d_g, d_g, Circ[j * 1 + 0]);
         // KJ
         v_cross(f, v_i, d_g);
         v_mult(f, f, Rho);
         for (size_t r = 0; r < 3; r++)
         {
             // local_force[:, j]
-            *(local_force + r * N + j) = f[r];
+            local_force[r * N + j] = f[r];
         }
     }
 }
