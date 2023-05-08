@@ -1,7 +1,7 @@
 target:
   altitude: 0 # m
-  north: 7000 # m
-  east: 7000 # m
+  north: 1100 # m
+  east: -1900 # m
   radius:  50 # m
 
 planet:
@@ -20,7 +20,7 @@ time:
   step: 0.005 # sec
 
 body:
-  altitude: 7000 # m
+  altitude: 2000 # m
   east: 0 # m
   north: 0 # m
 
@@ -120,13 +120,13 @@ autopilot:
   Kp_gs: -0.0022
   Ki_gs: -0.00001
   Kd_gs: -0.0015
-  Kp: -0.000015
+  Kp: -0.00002
   Ki: 0.0
-  Kd: -0.0001
-  loiter_decision_offset: 1.2
+  Kd: -0.000085
+  loiter_decision_offset: 1.8
   altitude_control_activation: 0.3
-  auto_turn_brake_input: 0.2
-  max_yaw_rate: 0.1
+  auto_turn_brake_input: 0.3
+  max_yaw_rate: 0.2
   incidence_gain: 1
   incidence_lower_limit: -0.15 # deg
   incidence_upper_limit: 0.15 # deg

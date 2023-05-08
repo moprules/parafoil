@@ -113,6 +113,47 @@ void vortxl(double *u, double *X1, double *X2, double *XP, double gamma)
     v_mult(u, r1xr2, gamma * (0.25 / PI) * c * inv_r1xr2);
 }
 
+void set_normals(int N, double angh, double *normals, double *delta0_f, double *yflap, double *alphalo, double *xbound, double *ypos, double *coord, double *len)
+{
+    double incalphaloflap_L = (delta0_f[0] / PI) * (PI - angh + sin(angh));
+    double incalphaloflap_R = (delta0_f[1] / PI) * (PI - angh + sin(angh));
+    double curr_a0;
+    double dx;
+    double dy;
+    double dz;
+    double aux;
+
+    for (size_t i = 0; i < N; i++)
+    {
+        curr_a0 = alphalo[i];
+        // Left wing
+        if (*(xbound + 1 * N + i) <= 0.0)
+        {
+            if ((-ypos[i] <= yflap[1]) && (-ypos[i] >= yflap[0]))
+            {
+                // Flap delta alpha0
+                curr_a0 = curr_a0 + incalphaloflap_L;
+            }
+        }
+        else
+        {
+            // Rigth wing
+            if ((ypos[i] >= yflap[2]) && (ypos[i] <= yflap[3]))
+            {
+                // Flap delta alpha0
+                curr_a0 = curr_a0 + incalphaloflap_R;
+            }
+        }
+        dx = sin(-curr_a0);
+        dy = -(*(coord + 2 * (N + 1) + i + 1) - *(coord + 2 * (N + 1) + i)) / len[i];
+        dz = cos(-curr_a0);
+        aux = 1 / sqrt(dx * dx + dy * dy + dz * dz);
+        normals[0 * N + i] = dx * aux;
+        normals[1 * N + i] = dy * aux;
+        normals[2 * N + i] = dz * aux;
+    }
+}
+
 void biot_savart(int N, double b, double *A, double *B, double *normals, double *xctrl, double *xbound, double *coord, double *Vinf)
 {
     double one = 1.0;

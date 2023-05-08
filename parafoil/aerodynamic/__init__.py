@@ -68,8 +68,8 @@ def velocity_initialization(model: dict, state: dict):
         mesh["Vinf"][k, :] = np.squeeze(Vref_m - Vrot_m)
         mesh["Vinf2"][k, :] = np.squeeze(Vref_m - Vrot_m2)
 
-    mesh["Vinf"] = np.ascontiguousarray(mesh["Vinf"])
-    mesh["Vinf2"] = np.ascontiguousarray(mesh["Vinf2"])
+    # mesh["Vinf"] = np.ascontiguousarray(mesh["Vinf"])
+    # mesh["Vinf2"] = np.ascontiguousarray(mesh["Vinf2"])
 
     state["delta0_f"] = np.zeros(2)
     state["delta0_f"][0] = model["canopy"]["cs"]["deflection"]["L"]
@@ -78,41 +78,52 @@ def velocity_initialization(model: dict, state: dict):
 
 
 def HVM(model: dict, state: dict):
-    angh = model["canopy"]["cs"]["angh"]
+    # angh = model["canopy"]["cs"]["angh"]
     delta0_f = state["delta0_f"]
-    incalphaloflap_L = (delta0_f[0]/np.pi)*(np.pi-angh+np.sin(angh))
-    incalphaloflap_R = (delta0_f[1]/np.pi)*(np.pi-angh+np.sin(angh))
-    yflap = model["canopy"]["cs"]["yflap"]
+    # incalphaloflap_L = (delta0_f[0]/np.pi)*(np.pi-angh+np.sin(angh))
+    # incalphaloflap_R = (delta0_f[1]/np.pi)*(np.pi-angh+np.sin(angh))
+    # yflap = model["canopy"]["cs"]["yflap"]
     mesh = state["mesh"]
-    normals = np.zeros((3, mesh["N"]))
-    for i in range(mesh["N"]):
-        curr_a0 = mesh["alphalo"][i]
-        # Left wing
-        if mesh["xbound"][1, i] <= 0.0:
-            if (-mesh["ypos"][i] <= yflap[1]) and (-mesh["ypos"][i] >= yflap[0]):
-                # Flap delta alpha0
-                curr_a0 = curr_a0 + incalphaloflap_L
-        else:
-            # Rigth wing
-            if (mesh["ypos"][i] >= yflap[2]) and (mesh["ypos"][i] <= yflap[3]):
-                # Flap delta alpha0
-                curr_a0 = curr_a0 + incalphaloflap_R
-        dx = np.sin(-curr_a0)
-        dy = -(mesh["coord"][2, i+1]-mesh["coord"][2, i])/mesh["len"][i]
-        dz = np.cos(-curr_a0)
-        aux = 1/np.sqrt(dx*dx+dy*dy+dz*dz)
-        normals[0, i] = dx*aux
-        normals[1, i] = dy*aux
-        normals[2, i] = dz*aux
+    N = mesh["N"]
+    normals = np.zeros((3, N))
+    aero.set_normals(N,
+                     model["canopy"]["cs"]["angh"],
+                     normals,
+                     delta0_f,
+                     model["canopy"]["cs"]["yflap"],
+                     mesh["alphalo"],
+                     mesh["xbound"],
+                     mesh["ypos"],
+                     mesh["coord"],
+                     mesh["len"])
+    # for i in range(N):
+    #     curr_a0 = mesh["alphalo"][i]
+    #     # Left wing
+    #     if mesh["xbound"][1, i] <= 0.0:
+    #         if (-mesh["ypos"][i] <= yflap[1]) and (-mesh["ypos"][i] >= yflap[0]):
+    #             # Flap delta alpha0
+    #             curr_a0 = curr_a0 + incalphaloflap_L
+    #     else:
+    #         # Rigth wing
+    #         if (mesh["ypos"][i] >= yflap[2]) and (mesh["ypos"][i] <= yflap[3]):
+    #             # Flap delta alpha0
+    #             curr_a0 = curr_a0 + incalphaloflap_R
+    #     dx = np.sin(-curr_a0)
+    #     dy = -(mesh["coord"][2, i+1]-mesh["coord"][2, i])/mesh["len"][i]
+    #     dz = np.cos(-curr_a0)
+    #     aux = 1/np.sqrt(dx*dx+dy*dy+dz*dz)
+    #     normals[0, i] = dx*aux
+    #     normals[1, i] = dy*aux
+    #     normals[2, i] = dz*aux
 
     # Equations and Biot - Savart law
-    normals = np.ascontiguousarray(normals)
-    A = np.zeros((mesh["N"], mesh["N"]))
-    A = np.ascontiguousarray(A)
-    B = np.zeros((mesh["N"], 1))
-    B = np.ascontiguousarray(B)
+    # normals = np.ascontiguousarray(normals)
+    A = np.zeros((N, N))
+    # A = np.ascontiguousarray(A)
+    B = np.zeros((N, 1))
+    # B = np.ascontiguousarray(B)
     b = model["canopy"]["span"]
-    aero.biot_savart(mesh["N"],
+    aero.biot_savart(N,
                      b,
                      A,
                      B,
@@ -125,12 +136,12 @@ def HVM(model: dict, state: dict):
     try:
         Circ = np.linalg.solve(A, B)
     except:
-        Circ = np.zeros((mesh["N"], 1))
+        Circ = np.zeros((N, 1))
 
-    local_force = np.zeros((3, mesh["N"]))
-    local_force = np.ascontiguousarray(local_force)
+    local_force = np.zeros((3, N))
+    # local_force = np.ascontiguousarray(local_force)
     # Loads computation (Kutta-Joukowsky)
-    aero.kutta_joukowsky(mesh["N"],
+    aero.kutta_joukowsky(N,
                          b,
                          state["Rho"],
                          local_force,
@@ -141,7 +152,7 @@ def HVM(model: dict, state: dict):
 
     # Aerodynamic forces and moments according to HVM
     tot_force = np.zeros(6)
-    for i in range(mesh["N"]):
+    for i in range(N):
         r = mesh["xbound"][:, i]
         # forces
         tot_force[:3] = tot_force[:3] + local_force[:, i]
@@ -157,7 +168,7 @@ def HVM(model: dict, state: dict):
     Uref_m = np.squeeze(state["Uref_m"])
     qq = 0.5*state["Rho"]*np.dot(Uref_m, Uref_m)
     # Integration of profile drag (from the airfoil's polar)
-    for i in range(mesh["N"]):
+    for i in range(N):
         # Assume Cl aprox Cz
         cz = local_force[2, i] / (qq * mesh["s"][i])
         cdp = (model["canopy"]["A_p"]*cz**2 +

@@ -76,6 +76,9 @@ def prepare_canopy(model: dict):
     # угор шарнира приводм в радианы
     canopy["cs"]["angh"] = np.radians(canopy["cs"]["angh"])
 
+    # Массив расположения узлов управления приводим в тип numpy
+    canopy["cs"]["yflap"] = np.asarray(canopy["cs"]["yflap"])
+
     # соотношение сторон
     canopy["AR"] = (canopy["span"] ** 2) / canopy["Sref"]
     # крайняя хорда парашюта
