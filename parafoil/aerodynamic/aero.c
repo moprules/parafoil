@@ -127,7 +127,7 @@ void set_normals(int N, double angh, double *normals, double *delta0_f, double *
     {
         curr_a0 = alphalo[i];
         // Left wing
-        if (*(xbound + 1 * N + i) <= 0.0)
+        if (xbound[1 * N + i] <= 0.0)
         {
             if ((-ypos[i] <= yflap[1]) && (-ypos[i] >= yflap[0]))
             {
@@ -145,7 +145,7 @@ void set_normals(int N, double angh, double *normals, double *delta0_f, double *
             }
         }
         dx = sin(-curr_a0);
-        dy = -(*(coord + 2 * (N + 1) + i + 1) - *(coord + 2 * (N + 1) + i)) / len[i];
+        dy = -(coord[2 * (N + 1) + i + 1] - coord[2 * (N + 1) + i]) / len[i];
         dz = cos(-curr_a0);
         aux = 1 / sqrt(dx * dx + dy * dy + dz * dz);
         normals[0 * N + i] = dx * aux;
@@ -175,36 +175,36 @@ void biot_savart(int N, double b, double *A, double *B, double *normals, double 
         for (size_t r = 0; r < 3; r++)
         {
             // xp[r] = xctrl[r, j];
-            xp[r] = *(xctrl + r * N + j);
+            xp[r] = xctrl[r * N + j];
             // nunit[r] = normals[r, j];
-            nunit[r] = *(normals + r * N + j);
-            uinf[r] = -*(Vinf + j * 3 + r);
+            nunit[r] = normals[r * N + j];
+            uinf[r] = -Vinf[j * 3 + r];
         }
         // B[j, 0] = -v_dot(uinf, nunit);
-        *(B + j * 1 + 0) = -v_dot(uinf, nunit);
+        B[j * 1 + 0] = -v_dot(uinf, nunit);
 
         for (size_t k = 0; k < N; k++)
         {
             // xb[0] = xbound[0, k];
-            xb[0] = *(xbound + 0 * N + k);
+            xb[0] = xbound[0 * N + k];
             xa[0] = xb[0] + 20 * b;
             xc[0] = xb[0];
             xd[0] = xa[0];
 
             // xb[1] = coord[1, k];
-            xb[1] = *(coord + 1 * (N + 1) + k);
+            xb[1] = coord[1 * (N + 1) + k];
             xa[1] = xb[1];
             // xc[1] = coord[1, k + 1];
-            xc[1] = *(coord + 1 * (N + 1) + k + 1);
+            xc[1] = coord[1 * (N + 1) + k + 1];
             xd[1] = xc[1];
 
             // (coord[2, k + 1] - coord[2, k]) / 2
-            coord_diff = (*(coord + 2 * (N + 1) + k + 1) - *(coord + 2 * (N + 1) + k)) / 2;
+            coord_diff = (coord[2 * (N + 1) + k + 1] - coord[2 * (N + 1) + k]) / 2;
             // xbound[2,k] - coord_diff
-            xb[2] = *(xbound + 2 * N + k) - coord_diff;
+            xb[2] = xbound[2 * N + k] - coord_diff;
             xa[2] = xb[2];
             // xbound[2,k] + coord_diff
-            xc[2] = *(xbound + 2 * N + k) + coord_diff;
+            xc[2] = xbound[2 * N + k] + coord_diff;
             xd[2] = xc[2];
 
             // First trailing vortex
@@ -217,7 +217,7 @@ void biot_savart(int N, double b, double *A, double *B, double *normals, double 
             v_sum(uindt, uind1, uind2);
             v_sum(uindt, uindt, uind3);
             // A[j, k] = v_dot(uindt, nunit)
-            *(A + j * N + k) = v_dot(uindt, nunit);
+            A[j * N + k] = v_dot(uindt, nunit);
         }
     }
 }
