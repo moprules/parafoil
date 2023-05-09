@@ -24,6 +24,9 @@ def init_files(files: dict = {}, path_to_res: str = "", path_to_model: str = "")
         key = os.path.splitext(file)[0]
         files[key] = open(os.path.join(res_folder, file), "a")
 
+    # Копируем сам файл модели
+    shutil.copy(path_to_model, res_folder)
+
 
 def init_coords(files: dict[str, io.TextIOWrapper], model: dict):
     """Инициализируем узел coords и доп узлы если нужно"""

@@ -107,12 +107,12 @@ def control(model: dict, state: dict):
 
     # FLIGHT CONTROLS SIMULATE
     # Flare
-    if state["altitude"] < 15 or state["altitude"] > model["body"]["altitude"]:
+    if state["altitude"] < ap["flare_altitude"] or state["altitude"] > model["body"]["altitude"]:
         state["rigging_angle"] = np.radians(-7)
         # left brake input
-        state["delta0_f"][0] = np.radians(-25)
+        state["delta0_f"][0] = ap["flare_angle"]
         # right brake input
-        state["delta0_f"][1] = np.radians(-25)
+        state["delta0_f"][1] = ap["flare_angle"]
     else:
         state["delta0_f"][0] = ap["left_brake_command"]
         state["delta0_f"][1] = ap["right_brake_command"]

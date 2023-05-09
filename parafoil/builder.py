@@ -123,6 +123,8 @@ def prepare_autopilot(model: dict):
 
     ap["tol_angle"] = np.radians(ap["tol_angle"])
 
+    ap["flare_angle"] = np.radians(ap["flare_angle"])
+
 
 def prepare_target(model: dict):
     target = model["target"]

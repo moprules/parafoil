@@ -130,3 +130,5 @@ autopilot:
   incidence_gain: 1
   incidence_lower_limit: -0.15 # deg
   incidence_upper_limit: 0.15 # deg
+  flare_altitude: 15 # m
+  flare_angle: -25 # deg
