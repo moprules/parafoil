@@ -123,12 +123,12 @@ autopilot:
   Kp: -0.000015
   Ki: 0.0
   Kd: -0.0001
-  loiter_decision_offset: 1.4
-  altitude_control_activation: 0.21
-  auto_turn_brake_input: 0.2
+  loiter_decision_offset: 1
+  altitude_control_activation: 0.15
+  auto_turn_brake_input: 0.22
   max_yaw_rate: 0.15
   incidence_gain: 1
   incidence_lower_limit: -0.15 # deg
   incidence_upper_limit: 0.15 # deg
-  flare_altitude: 7.5 # m
+  flare_altitude: 15 # m
   flare_angle: -25 # deg
