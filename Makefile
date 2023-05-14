@@ -5,4 +5,4 @@ else
 endif
 
 aero:
-	gcc -shared -o parafoil/aerodynamic/aero.$(LIB_EXT) -fPIC parafoil/aerodynamic/aero.c
+	gcc -shared -Ofast -o parafoil/aerodynamic/aero.$(LIB_EXT) -fPIC parafoil/aerodynamic/aero.c
